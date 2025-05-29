@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "BabyFlow",
+    "name": "宝宝吃拉睡",
     "slug": "BabyFlow",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -16,7 +16,8 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.yunqian2024.BabyFlow"
     },
     "web": {
       "bundler": "metro",
@@ -33,10 +34,24 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "expo-sqlite"
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "4e2787fa-85a7-468c-b575-f33c2d22837c"
+      }
+    },
+    "owner": "yunqian2024",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/4e2787fa-85a7-468c-b575-f33c2d22837c"
     }
   }
 }
