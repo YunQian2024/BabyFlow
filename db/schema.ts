@@ -1,3 +1,4 @@
+import { InferSelectModel } from 'drizzle-orm';
 import { int, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 /** 配置表 */
@@ -16,3 +17,5 @@ export const formulaMilkTable = sqliteTable('formula_milk_log', {
   durationMinutes: int().notNull(),
   milkIntake: int().notNull(),
 });
+
+export type FormulaMilk = InferSelectModel<typeof formulaMilkTable>;

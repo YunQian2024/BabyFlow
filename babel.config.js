@@ -14,14 +14,12 @@ module.exports = function (api) {
 
     plugins: [
       [
-        'module-resolver',
+        '@tamagui/babel-plugin',
         {
-          root: ['./'],
-
-          alias: {
-            '@': './',
-            'tailwind.config': './tailwind.config.js',
-          },
+          components: ['tamagui'],
+          config: './tamagui.config.ts',
+          logTimings: true,
+          disableExtraction: process.env.NODE_ENV === 'development',
         },
       ],
       ['inline-import', { extensions: ['.sql'] }],
