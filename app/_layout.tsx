@@ -63,7 +63,8 @@ function RootLayoutNav() {
             headerShown: false,
           }}
         />
-        <Stack.Screen name="add-or-formula-milk" options={{ title: '配方奶' }} />
+        <Stack.Screen name="add-or-update-formula-milk" options={{ title: '配方奶' }} />
+        <Stack.Screen name="add-or-update-poop" options={{ title: '臭臭' }} />
         <Stack.Screen
           name="modal"
           options={{

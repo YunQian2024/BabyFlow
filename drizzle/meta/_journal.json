@@ -8,6 +8,13 @@
       "when": 1748517625485,
       "tag": "0000_hard_queen_noir",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1749044251063,
+      "tag": "0001_stormy_blackheart",
+      "breakpoints": true
     }
   ]
 }

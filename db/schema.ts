@@ -18,4 +18,15 @@ export const formulaMilkTable = sqliteTable('formula_milk_log', {
   milkIntake: int().notNull(),
 });
 
+/** 臭臭记录表 */
+export const poopTable = sqliteTable('poop_log', {
+  id: int().primaryKey({ autoIncrement: true }),
+  createTime: text().notNull(),
+  color: text().notNull(),
+  shape: text().notNull(),
+  image: text(),
+  remark: text(),
+});
+
 export type FormulaMilk = InferSelectModel<typeof formulaMilkTable>;
+export type Poop = InferSelectModel<typeof poopTable>;
