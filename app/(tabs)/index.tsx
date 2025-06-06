@@ -1,37 +1,32 @@
-import { PressableCard } from "../../components/PressableCard";
-import { Box } from "../../components/ui/box";
-import { ButtonIcon, ButtonText } from "../../components/ui/button";
-import { useDb } from "../../hooks/useDb";
-import { useFormulaMilkStore } from "../../hooks/useFormulaMilkStore";
-import { FlashList } from "@shopify/flash-list";
-import dayjs from "dayjs";
-import { eq, like } from "drizzle-orm";
-import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
-import { useRouter } from "expo-router";
-import { MilkIcon } from "lucide-react-native";
-import { useEffect, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { ListItem, ScrollView, Text, XStack, YStack } from "tamagui";
-import {
-  FormulaMilk,
-  formulaMilkTable,
-  Poop,
-  poopTable,
-} from "../../db/schema";
-import migrations from "../../drizzle/migrations";
+import { PressableCard } from '../../components/PressableCard'
+import { Box } from '../../components/ui/box'
+import { ButtonIcon, ButtonText } from '../../components/ui/button'
+import { useDb } from '../../hooks/useDb'
+import { useFormulaMilkStore } from '../../hooks/useFormulaMilkStore'
+import { FlashList } from '@shopify/flash-list'
+import dayjs from 'dayjs'
+import { eq, like } from 'drizzle-orm'
+import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator'
+import { useRouter } from 'expo-router'
+import { MilkIcon } from 'lucide-react-native'
+import { useEffect, useState } from 'react'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { ListItem, ScrollView, Text, XStack, YStack } from 'tamagui'
+import { type FormulaMilk, formulaMilkTable, type Poop, poopTable } from '../../db/schema'
+import migrations from '../../drizzle/migrations'
 
-import { Heading } from "../../components/ui/heading";
-import { Icon, TrashIcon } from "../../components/ui/icon";
-import { Button, Card, H2, Image, Paragraph, AlertDialog, View } from "tamagui";
-import { Milk } from "@tamagui/lucide-icons";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import PoopIcon from "components/icon/PoopIcon";
-import { usePoopStore } from "hooks/usePoopStore";
+import { Heading } from '../../components/ui/heading'
+import { Icon, TrashIcon } from '../../components/ui/icon'
+import { Button, Card, H2, Image, Paragraph, AlertDialog, View } from 'tamagui'
+import { Milk } from '@tamagui/lucide-icons'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import PoopIcon from 'components/icon/PoopIcon'
+import { usePoopStore } from 'hooks/usePoopStore'
 
 export default function HomeScreen() {
-  const router = useRouter();
-  const db = useDb();
-  const { success, error } = useMigrations(db, migrations);
+  const router = useRouter()
+  const db = useDb()
+  const { success, error } = useMigrations(db, migrations)
   const {
     list: milkList,
     dailyTimes,
@@ -42,7 +37,7 @@ export default function HomeScreen() {
     setDailyTimes,
     setDailyMilkIntake,
     setListNeedReload,
-  } = useFormulaMilkStore();
+  } = useFormulaMilkStore()
 
   const {
     list: poopList,
@@ -52,48 +47,43 @@ export default function HomeScreen() {
     setForm: setPoopForm,
     setPoopTimes,
     setListNeedReload: setPoopListNeedReload,
-  } = usePoopStore();
+  } = usePoopStore()
 
-  const [showAlertDialog, setShowAlertDialog] = useState(false);
-  const handleClose = () => setShowAlertDialog(false);
+  const [showAlertDialog, setShowAlertDialog] = useState(false)
+  const handleClose = () => setShowAlertDialog(false)
 
-  const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [deleteId, setDeleteId] = useState<number | null>(null)
 
-  const { top, bottom } = useSafeAreaInsets();
+  const { top, bottom } = useSafeAreaInsets()
 
   const handleDelete = async () => {
     if (deleteId) {
-      await db
-        .delete(formulaMilkTable)
-        .where(eq(formulaMilkTable.id, deleteId));
-      setDeleteId(null);
-      setListNeedReload(true);
-      setShowAlertDialog(false);
+      await db.delete(formulaMilkTable).where(eq(formulaMilkTable.id, deleteId))
+      setDeleteId(null)
+      setListNeedReload(true)
+      setShowAlertDialog(false)
     }
-  };
+  }
 
   useEffect(() => {
-    if (!success) return;
+    if (!success) return
 
-    if (!listNeedReload) return;
+    if (!listNeedReload) return
 
-    (async () => {
+    ;(async () => {
       const formulaMilkList = await db
         .select()
         .from(formulaMilkTable)
         .where(
-          like(
-            formulaMilkTable.endTime,
-            dayjs(new Date()).format("YYYY-MM-DD") + "%"
-          )
-        );
-      setList(formulaMilkList);
-      setDailyTimes(formulaMilkList.length);
+          like(formulaMilkTable.endTime, dayjs(new Date()).format('YYYY-MM-DD') + '%')
+        )
+      setList(formulaMilkList)
+      setDailyTimes(formulaMilkList.length)
       setDailyMilkIntake(
         formulaMilkList.reduce((value, item) => item.milkIntake + value, 0)
-      );
-      setListNeedReload(false);
-    })();
+      )
+      setListNeedReload(false)
+    })()
   }, [
     db,
     setList,
@@ -102,70 +92,52 @@ export default function HomeScreen() {
     success,
     setDailyTimes,
     setDailyMilkIntake,
-  ]);
+  ])
 
   useEffect(() => {
-    if (!success) return;
+    if (!success) return
 
-    if (!poopListNeedReload) return;
+    if (!poopListNeedReload) return
 
-    (async () => {
+    ;(async () => {
       const poopList = await db
         .select()
         .from(poopTable)
-        .where(
-          like(
-            poopTable.createTime,
-            dayjs(new Date()).format("YYYY-MM-DD") + "%"
-          )
-        );
-      setPoopList(poopList);
-      setPoopTimes(poopList.length);
-      setPoopListNeedReload(false);
-    })();
-  }, [
-    db,
-    setPoopList,
-    setPoopListNeedReload,
-    poopListNeedReload,
-    success,
-    setPoopTimes,
-  ]);
+        .where(like(poopTable.createTime, dayjs(new Date()).format('YYYY-MM-DD') + '%'))
+      setPoopList(poopList)
+      setPoopTimes(poopList.length)
+      setPoopListNeedReload(false)
+    })()
+  }, [db, setPoopList, setPoopListNeedReload, poopListNeedReload, success, setPoopTimes])
 
   if (error) {
     return (
       <View>
         <Text>Migration error: {error.message}</Text>
       </View>
-    );
+    )
   }
   if (!success) {
     return (
       <View>
         <Text>Migration is in progress...</Text>
       </View>
-    );
+    )
   }
 
   const list = [
     ...milkList.map((item) => {
-      return { ...item, type: "FORMULA_MILK", createTime: item.endTime };
+      return { ...item, type: 'FORMULA_MILK', createTime: item.endTime }
     }),
     ...poopList.map((item) => {
-      return { ...item, type: "POOP" };
+      return { ...item, type: 'POOP' }
     }),
-  ].sort((a, b) => a.createTime.localeCompare(b.createTime));
+  ].sort((a, b) => a.createTime.localeCompare(b.createTime))
 
   return (
     <YStack bg="$background" gap="$2" p="$2" height="100%">
       <SafeAreaView>
-        <YStack
-          borderWidth={2}
-          borderColor="$borderColor"
-          rounded="$4"
-          gap="$2"
-          p="$2"
-        >
+        <YStack borderWidth={2} borderColor="$borderColor" rounded="$4" gap="$2" p="$2">
           <Text>当日统计+宝宝头像</Text>
           <Text>吃奶次数: {dailyTimes}次</Text>
           <Text>总进食量: {dailyMilkIntake}ml</Text>
@@ -177,10 +149,10 @@ export default function HomeScreen() {
           {list.map((item) => {
             // 类型守卫：配方奶类型
             const isMilkType = (obj: any): obj is FormulaMilk =>
-              obj.type === "FORMULA_MILK";
+              obj.type === 'FORMULA_MILK'
 
             // 类型守卫：大便类型
-            const isPoopType = (obj: any): obj is Poop => obj.type === "POOP";
+            const isPoopType = (obj: any): obj is Poop => obj.type === 'POOP'
 
             return isMilkType(item) ? (
               // 配方奶类型
@@ -195,17 +167,17 @@ export default function HomeScreen() {
                 items="center"
                 p="$4"
                 onPress={() => {
-                  setForm(item);
-                  router.push("/add-or-update-formula-milk");
+                  setForm(item)
+                  router.push('/add-or-update-formula-milk')
                 }}
                 onLongPress={() => {
-                  setDeleteId(item.id);
-                  setShowAlertDialog(true);
+                  setDeleteId(item.id)
+                  setShowAlertDialog(true)
                 }}
               >
                 <Text flex={1}>
-                  {item.startTime.substring(11, 16)} ~
-                  {item.endTime.substring(11, 16)} ({item.durationMinutes}
+                  {item.startTime.substring(11, 16)} ~{item.endTime.substring(11, 16)} (
+                  {item.durationMinutes}
                   分钟)
                 </Text>
                 <Text fontWeight="bold" width="$6">
@@ -226,8 +198,8 @@ export default function HomeScreen() {
                 items="center"
                 p="$4"
                 onPress={() => {
-                  setPoopForm(item);
-                  router.push("/add-or-update-poop");
+                  setPoopForm(item)
+                  router.push('/add-or-update-poop')
                 }}
               >
                 <Text flex={1}>{item.createTime.substring(11, 16)}</Text>
@@ -236,7 +208,7 @@ export default function HomeScreen() {
                 </Text>
                 <Text width="$4">{item.shape}</Text>
               </Card>
-            ) : null;
+            ) : null
           })}
         </YStack>
       </ScrollView>
@@ -248,16 +220,12 @@ export default function HomeScreen() {
           size="$6"
           onPress={() => {
             setForm({
-              startTime: dayjs(new Date())
-                .add(-11, "minute")
-                .format("YYYY-MM-DD HH:mm"),
-              endTime: dayjs(new Date())
-                .add(-1, "minute")
-                .format("YYYY-MM-DD HH:mm"),
+              startTime: dayjs(new Date()).add(-11, 'minute').format('YYYY-MM-DD HH:mm'),
+              endTime: dayjs(new Date()).add(-1, 'minute').format('YYYY-MM-DD HH:mm'),
               durationMinutes: 10,
               milkIntake: 180,
-            } as FormulaMilk);
-            router.push("/add-or-update-formula-milk");
+            } as FormulaMilk)
+            router.push('/add-or-update-formula-milk')
           }}
         />
         <Button
@@ -267,11 +235,11 @@ export default function HomeScreen() {
           size="$6"
           onPress={() => {
             setPoopForm({
-              createTime: dayjs(new Date()).format("YYYY-MM-DD HH:mm"),
-              color: "#b08c3c",
-              shape: "正常",
-            } as Poop);
-            router.push("/add-or-update-poop");
+              createTime: dayjs(new Date()).format('YYYY-MM-DD HH:mm'),
+              color: '#b08c3c',
+              shape: '正常',
+            } as Poop)
+            router.push('/add-or-update-poop')
           }}
         />
       </XStack>
@@ -290,7 +258,7 @@ export default function HomeScreen() {
             elevate
             key="content"
             animation={[
-              "quick",
+              'quick',
               {
                 opacity: {
                   overshootClamping: true,
@@ -305,9 +273,7 @@ export default function HomeScreen() {
             y={0}
           >
             <YStack gap="$4">
-              <AlertDialog.Title size="$5">
-                确认删除此条记录？
-              </AlertDialog.Title>
+              <AlertDialog.Title size="$5">确认删除此条记录？</AlertDialog.Title>
 
               <XStack gap="$3" justify="flex-end">
                 <AlertDialog.Cancel asChild>
@@ -324,5 +290,5 @@ export default function HomeScreen() {
         </AlertDialog.Portal>
       </AlertDialog>
     </YStack>
-  );
+  )
 }

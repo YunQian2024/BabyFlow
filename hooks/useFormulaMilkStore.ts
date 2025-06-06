@@ -1,18 +1,18 @@
-import { create } from 'zustand';
-import { FormulaMilk } from '../db/schema';
+import { create } from 'zustand'
+import type { FormulaMilk } from '../db/schema'
 
 interface FormulaMilkState {
-  list: FormulaMilk[];
-  form: FormulaMilk;
-  dailyTimes: number;
-  dailyMilkIntake: number;
-  listNeedReload: boolean;
-  setList: (v: FormulaMilk[]) => void;
-  setForm: (v: FormulaMilk) => void;
-  updateForm: (key: string, value: any) => void;
-  setDailyTimes: (v: number) => void;
-  setDailyMilkIntake: (v: number) => void;
-  setListNeedReload: (v: boolean) => void;
+  list: FormulaMilk[]
+  form: FormulaMilk
+  dailyTimes: number
+  dailyMilkIntake: number
+  listNeedReload: boolean
+  setList: (v: FormulaMilk[]) => void
+  setForm: (v: FormulaMilk) => void
+  updateForm: (key: string, value: any) => void
+  setDailyTimes: (v: number) => void
+  setDailyMilkIntake: (v: number) => void
+  setListNeedReload: (v: boolean) => void
 }
 
 export const useFormulaMilkStore = create<FormulaMilkState>()((set, get) => ({
@@ -21,8 +21,8 @@ export const useFormulaMilkStore = create<FormulaMilkState>()((set, get) => ({
   dailyTimes: 0,
   dailyMilkIntake: 0,
   listNeedReload: true,
-  setList: v => set(() => ({ list: v })),
-  setForm: v => set(() => ({ form: v })),
+  setList: (v) => set(() => ({ list: v })),
+  setForm: (v) => set(() => ({ form: v })),
   updateForm: (k, v) =>
     set(() => ({
       form: {
@@ -30,7 +30,7 @@ export const useFormulaMilkStore = create<FormulaMilkState>()((set, get) => ({
         [k]: v,
       },
     })),
-  setDailyTimes: v => set(() => ({ dailyTimes: v })),
-  setDailyMilkIntake: v => set(() => ({ dailyMilkIntake: v })),
-  setListNeedReload: v => set(() => ({ listNeedReload: v })),
-}));
+  setDailyTimes: (v) => set(() => ({ dailyTimes: v })),
+  setDailyMilkIntake: (v) => set(() => ({ dailyMilkIntake: v })),
+  setListNeedReload: (v) => set(() => ({ listNeedReload: v })),
+}))

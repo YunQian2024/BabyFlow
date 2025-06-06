@@ -1,33 +1,23 @@
-import dayjs from "dayjs";
-import { CalendarIcon } from "lucide-react-native";
-import { FC, useState } from "react";
-import { Modal, TouchableOpacity } from "react-native";
+import dayjs from 'dayjs'
+import { CalendarIcon } from 'lucide-react-native'
+import { type FC, useState } from 'react'
+import { Modal, TouchableOpacity } from 'react-native'
 import DateTimePicker, {
-  DateType,
+  type DateType,
   useDefaultClassNames,
-} from "react-native-ui-datepicker";
-import {
-  Button,
-  Form,
-  H4,
-  Spinner,
-  XGroup,
-  Input,
-  YStack,
-  Label,
-  View,
-} from "tamagui";
-import { Calendar } from "@tamagui/lucide-icons";
+} from 'react-native-ui-datepicker'
+import { Button, Form, H4, Spinner, XGroup, Input, YStack, Label, View } from 'tamagui'
+import { Calendar } from '@tamagui/lucide-icons'
 
 export const DatePicker: FC<{
-  id: string;
-  initDate?: DateType;
-  placeholder?: string;
-  onChange: (date: string) => void;
+  id: string
+  initDate?: DateType
+  placeholder?: string
+  onChange: (date: string) => void
 }> = ({ id, initDate, placeholder, onChange }) => {
-  const defaultClassNames = useDefaultClassNames();
-  const [show, setShow] = useState(false);
-  const [selected, setSelected] = useState<DateType>(initDate);
+  const defaultClassNames = useDefaultClassNames()
+  const [show, setShow] = useState(false)
+  const [selected, setSelected] = useState<DateType>(initDate)
 
   return (
     <View>
@@ -74,23 +64,23 @@ export const DatePicker: FC<{
               timePicker={true}
               initialView="time"
               onChange={({ date }) => {
-                setSelected(dayjs(date).format("YYYY-MM-DD HH:mm"));
-                onChange(dayjs(date).format("YYYY-MM-DD HH:mm"));
+                setSelected(dayjs(date).format('YYYY-MM-DD HH:mm'))
+                onChange(dayjs(date).format('YYYY-MM-DD HH:mm'))
               }}
-              locale={"zh"}
-              timeZone={"Asia/Shanghai"}
+              locale={'zh'}
+              timeZone={'Asia/Shanghai'}
               classNames={{
                 ...defaultClassNames,
-                today: "border-amber-500",
-                selected: "bg-amber-500 border-amber-500",
-                selected_label: "text-white",
+                today: 'border-amber-500',
+                selected: 'bg-amber-500 border-amber-500',
+                selected_label: 'text-white',
                 day: `${defaultClassNames.day} hover:bg-amber-100`,
-                disabled: "opacity-50",
+                disabled: 'opacity-50',
               }}
             />
           </View>
         </Modal>
       )}
     </View>
-  );
-};
+  )
+}

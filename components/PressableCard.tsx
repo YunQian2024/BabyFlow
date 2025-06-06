@@ -1,13 +1,13 @@
-import { Card } from '@/components/ui/card';
-import { Pressable } from '@/components/ui/pressable';
+import { Card } from '@/components/ui/card'
+import { Pressable } from '@/components/ui/pressable'
 
-import { FC, ReactNode } from 'react';
+import type { FC, ReactNode } from 'react'
 
 export const PressableCard: FC<{
-  className?: string;
-  children: ReactNode;
-  onPress: () => void;
-  onLongPress?: () => void;
+  className?: string
+  children: ReactNode
+  onPress: () => void
+  onLongPress?: () => void
 }> = ({ className, children, onPress, onLongPress }) => {
   return (
     <Pressable onPress={onPress} onLongPress={onLongPress}>
@@ -23,11 +23,12 @@ export const PressableCard: FC<{
                   scale: pressed ? 0.98 : 1,
                 },
               ],
-            }}>
+            }}
+          >
             {children}
           </Card>
-        );
+        )
       }}
     </Pressable>
-  );
-};
+  )
+}

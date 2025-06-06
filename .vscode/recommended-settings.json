@@ -1,0 +1,58 @@
+{
+  // VSCode settings
+  // Text Editor
+  "editor.fontFamily": "'JetBrainsMono Nerd Font', 'FiraCode Nerd Font', Menlo, Monaco, 'Courier New', monospace", // 字体
+  "editor.fontLigatures": true, // 字体连字符
+  // "editor.fontSize": 14, // 设置字体大小， 默认 14
+  "editor.wordWrap": "bounded", // 设置 超过word Wrap Column设置的字符数、达到视口最小宽度，时自动换行
+  "editor.wordWrapColumn": 160, // editor.wordWrap 配置为wordWrapColumn或者bounded时起作用
+  "editor.tabSize": 2, // 一个制表符等于的空格数。在 `#editor.detectIndentation#` 启用时，根据文件内容，该设置可能会被覆盖。
+  "editor.insertSpaces": true, // 设置输入tab键时是否自动转为插入空格（默认ture，即自动转空格）,当editor.detectIndentation配置为 true 时，该配置项将被自动覆盖
+  "editor.detectIndentation": false, // 设置是否自动检测对齐，控制打开文件时是否基于文件内容，自动检测editor.tabSize 和editor.insertSpaces
+  "editor.inlineSuggest.enabled": true, // 设置是否启用内联提示
+  // 开启自动显示建议
+  "editor.quickSuggestions": {
+    "other": true,
+    "comments": true,
+    "strings": true
+  },
+
+  // Text Editor -> Minimap
+  "editor.minimap.maxColumn": 120, // 设置minimap的宽度以设置可渲染的最大列数，默认120
+  "editor.minimap.renderCharacters": false, // 设置 minimap 渲染成小色块，而不是字符
+
+  // Text Editor -> Formatting
+  "editor.formatOnPaste": true, // 设置黏贴内容时是否自动格式化，true表示自动格式化，需要配置格式化器(formatter)才可使用
+  "editor.formatOnSave": true, // 设置保存文件时是否自动格式化，true表示自动格式化,需要配置格式化器(formatter)才可使用
+  "editor.formatOnSaveMode": "file", // 设置保存文件时格式化整个文件还是仅被修改处。该配置项仅在 "editor.formatOnPaste" 为 true时生效
+  "editor.formatOnType": true, // 设置输入完成后是否自动格式化当前行
+
+  // TypeScript 配置
+  "typescript.updateImportsOnFileMove.enabled": "always", // 设置移动文件时是否更新导入语句
+  // Files
+  // "files.autoSave": "afterDelay", //设置延迟一定的时间后自动保存文件
+  // "files.autoSaveDelay": 5000, // 设置自动保存文件前需要延迟的时间，单位毫秒 默认1000
+  // "files.enableTrash": true, // 设置删除文件、目录时是否允许删除到操作系统回收站，默认为true，即允许
+  // "files.encoding": "utf8", // 设置读写文件时所用编码 默认UTF-8，可针对每种语言进行设置
+  // "files.autoGuessEncoding": false, // 设置打开文件时，是否自动猜测字符编码，默认false，即不自动猜测，可针对每种语言进行设置
+
+  // 设置各种代码的默认格式化器
+  "[typescript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "editor.codeActionsOnSave": {
+    "source.fixAll.biome": "explicit"
+  }
+}
