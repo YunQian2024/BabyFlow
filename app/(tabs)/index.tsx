@@ -1,27 +1,26 @@
-import { PressableCard } from '../../components/PressableCard'
-import { Box } from '../../components/ui/box'
-import { ButtonIcon, ButtonText } from '../../components/ui/button'
-import { useDb } from '../../hooks/useDb'
-import { useFormulaMilkStore } from '../../hooks/useFormulaMilkStore'
-import { FlashList } from '@shopify/flash-list'
+import { type FormulaMilk, type Poop, formulaMilkTable, poopTable } from '@/db/schema'
+import migrations from '@/drizzle/migrations'
+import { useDb } from '@/hooks/useDb'
+import { useFormulaMilkStore } from '@/hooks/useFormulaMilkStore'
+import { Milk } from '@tamagui/lucide-icons'
+import PoopIcon from 'components/icon/PoopIcon'
 import dayjs from 'dayjs'
 import { eq, like } from 'drizzle-orm'
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator'
 import { useRouter } from 'expo-router'
-import { MilkIcon } from 'lucide-react-native'
+import { usePoopStore } from 'hooks/usePoopStore'
 import { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { ListItem, ScrollView, Text, XStack, YStack } from 'tamagui'
-import { type FormulaMilk, formulaMilkTable, type Poop, poopTable } from '../../db/schema'
-import migrations from '../../drizzle/migrations'
-
-import { Heading } from '../../components/ui/heading'
-import { Icon, TrashIcon } from '../../components/ui/icon'
-import { Button, Card, H2, Image, Paragraph, AlertDialog, View } from 'tamagui'
-import { Milk } from '@tamagui/lucide-icons'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import PoopIcon from 'components/icon/PoopIcon'
-import { usePoopStore } from 'hooks/usePoopStore'
+import {
+  AlertDialog,
+  Button,
+  Card,
+  ScrollView,
+  Text,
+  View,
+  XStack,
+  YStack,
+} from 'tamagui'
 
 export default function HomeScreen() {
   const router = useRouter()
@@ -54,8 +53,6 @@ export default function HomeScreen() {
 
   const [deleteId, setDeleteId] = useState<number | null>(null)
 
-  const { top, bottom } = useSafeAreaInsets()
-
   const handleDelete = async () => {
     if (deleteId) {
       await db.delete(formulaMilkTable).where(eq(formulaMilkTable.id, deleteId))
@@ -69,7 +66,6 @@ export default function HomeScreen() {
     if (!success) return
 
     if (!listNeedReload) return
-
     ;(async () => {
       const formulaMilkList = await db
         .select()
@@ -98,7 +94,6 @@ export default function HomeScreen() {
     if (!success) return
 
     if (!poopListNeedReload) return
-
     ;(async () => {
       const poopList = await db
         .select()
@@ -135,9 +130,9 @@ export default function HomeScreen() {
   ].sort((a, b) => a.createTime.localeCompare(b.createTime))
 
   return (
-    <YStack bg="$background" gap="$2" p="$2" height="100%">
+    <YStack bg="$background" gap="$2" height="100%" p="$2">
       <SafeAreaView>
-        <YStack borderWidth={2} borderColor="$borderColor" rounded="$4" gap="$2" p="$2">
+        <YStack borderColor="$borderColor" borderWidth={2} gap="$2" p="$2" rounded="$4">
           <Text>当日统计+宝宝头像</Text>
           <Text>吃奶次数: {dailyTimes}次</Text>
           <Text>总进食量: {dailyMilkIntake}ml</Text>
@@ -157,23 +152,23 @@ export default function HomeScreen() {
             return isMilkType(item) ? (
               // 配方奶类型
               <Card
-                theme="accent"
                 bordered
-                height={60}
-                key={item.id}
-                pressStyle={{ scale: 0.95 }}
                 display="flex"
                 flexDirection="row"
+                height={60}
                 items="center"
-                p="$4"
-                onPress={() => {
-                  setForm(item)
-                  router.push('/add-or-update-formula-milk')
-                }}
+                key={item.id}
                 onLongPress={() => {
                   setDeleteId(item.id)
                   setShowAlertDialog(true)
                 }}
+                onPress={() => {
+                  setForm(item)
+                  router.push('/add-or-update-formula-milk')
+                }}
+                p="$4"
+                pressStyle={{ scale: 0.95 }}
+                theme="accent"
               >
                 <Text flex={1}>
                   {item.startTime.substring(11, 16)} ~{item.endTime.substring(11, 16)} (
@@ -188,19 +183,19 @@ export default function HomeScreen() {
             ) : isPoopType(item) ? (
               // 大便类型
               <Card
-                bg={item.color}
                 bordered
-                height={60}
-                key={item.id}
-                pressStyle={{ scale: 0.95 }}
                 display="flex"
                 flexDirection="row"
+                height={60}
                 items="center"
-                p="$4"
+                key={item.id}
                 onPress={() => {
                   setPoopForm(item)
                   router.push('/add-or-update-poop')
                 }}
+                p="$4"
+                pressStyle={{ scale: 0.95 }}
+                style={{ backgroundColor: item.color }}
               >
                 <Text flex={1}>{item.createTime.substring(11, 16)}</Text>
                 <Text fontWeight="bold" width="$6">
@@ -212,12 +207,9 @@ export default function HomeScreen() {
           })}
         </YStack>
       </ScrollView>
-      <XStack justify="center" gap="$5">
+      <XStack gap="$5" justify="center">
         <Button
-          theme="accent"
-          self="center"
           icon={Milk}
-          size="$6"
           onPress={() => {
             setForm({
               startTime: dayjs(new Date()).add(-11, 'minute').format('YYYY-MM-DD HH:mm'),
@@ -227,12 +219,12 @@ export default function HomeScreen() {
             } as FormulaMilk)
             router.push('/add-or-update-formula-milk')
           }}
+          self="center"
+          size="$6"
+          theme="accent"
         />
         <Button
-          theme="accent"
-          self="center"
           icon={PoopIcon}
-          size="$6"
           onPress={() => {
             setPoopForm({
               createTime: dayjs(new Date()).format('YYYY-MM-DD HH:mm'),
@@ -241,22 +233,21 @@ export default function HomeScreen() {
             } as Poop)
             router.push('/add-or-update-poop')
           }}
+          self="center"
+          size="$6"
+          theme="accent"
         />
       </XStack>
-      <AlertDialog open={showAlertDialog} onOpenChange={setShowAlertDialog}>
+      <AlertDialog onOpenChange={setShowAlertDialog} open={showAlertDialog}>
         <AlertDialog.Portal>
           <AlertDialog.Overlay
-            key="overlay"
             animation="quick"
-            opacity={0.5}
             enterStyle={{ opacity: 0 }}
             exitStyle={{ opacity: 0 }}
+            key="overlay"
+            opacity={0.5}
           />
           <AlertDialog.Content
-            width="80%"
-            bordered
-            elevate
-            key="content"
             animation={[
               'quick',
               {
@@ -265,11 +256,15 @@ export default function HomeScreen() {
                 },
               },
             ]}
+            bordered
+            elevate
             enterStyle={{ x: 0, y: -20, opacity: 0, scale: 0.9 }}
             exitStyle={{ x: 0, y: 10, opacity: 0, scale: 0.95 }}
-            x={0}
-            scale={1}
+            key="content"
             opacity={1}
+            scale={1}
+            width="80%"
+            x={0}
             y={0}
           >
             <YStack gap="$4">
@@ -280,7 +275,7 @@ export default function HomeScreen() {
                   <Button>取消</Button>
                 </AlertDialog.Cancel>
                 <AlertDialog.Action asChild>
-                  <Button theme="accent" onPress={handleDelete}>
+                  <Button onPress={handleDelete} theme="accent">
                     删除
                   </Button>
                 </AlertDialog.Action>

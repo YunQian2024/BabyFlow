@@ -1,25 +1,12 @@
-import { Box } from '../components/ui/box'
-import { ButtonText } from '../components/ui/button'
-import {
-  FormControl,
-  FormControlError,
-  FormControlErrorIcon,
-  FormControlErrorText,
-  FormControlLabel,
-  FormControlLabelText,
-} from '../components/ui/form-control'
-import { AlertCircleIcon } from '../components/ui/icon'
-import { useDb } from '../hooks/useDb'
-import { useFormulaMilkStore } from '../hooks/useFormulaMilkStore'
-import { useRouter } from 'expo-router'
-import { useState } from 'react'
-import { formulaMilkTable } from '../db/schema'
-import { Calendar } from '@tamagui/lucide-icons'
-
-import { DatePicker } from '../components/DatePicker'
+import { DatePicker } from '@/components/DatePicker'
+import { formulaMilkTable } from '@/db/schema'
+import { useDb } from '@/hooks/useDb'
+import { useFormulaMilkStore } from '@/hooks/useFormulaMilkStore'
 import { eq } from 'drizzle-orm'
-import { Button, Form, H4, Spinner, XGroup, Input, YStack, Label } from 'tamagui'
+import { useRouter } from 'expo-router'
 import React from 'react'
+import { Button, Form, Input, Label, Spinner, YStack } from 'tamagui'
+
 export default function AddFormulaMilk() {
   const [status, setStatus] = React.useState<'off' | 'submitting' | 'submitted'>('off')
 
@@ -28,9 +15,7 @@ export default function AddFormulaMilk() {
   const db = useDb()
   const { form, updateForm, setListNeedReload } = useFormulaMilkStore()
   const milkIntakeText = form.milkIntake?.toString() || ''
-  const durationMinutesText = form.durationMinutes?.toString() || ''
 
-  const [isInvalid, setIsInvalid] = useState(false)
   const handleSubmit = async () => {
     setStatus('submitting')
     if (form.id) {
@@ -46,46 +31,48 @@ export default function AddFormulaMilk() {
   return (
     <Form gap="$3" onSubmit={handleSubmit} p="$4">
       <YStack>
-        <Label width={90} htmlFor="startTime">
+        <Label htmlFor="startTime" width={90}>
           开始时间
         </Label>
         <DatePicker
           id="startTime"
           initDate={form.startTime}
-          placeholder="选择开始时间"
           onChange={(date) => updateForm('startTime', date)}
+          placeholder="选择开始时间"
         />
       </YStack>
 
       <YStack>
-        <Label width={90} htmlFor="endTime">
+        <Label htmlFor="endTime" width={90}>
           结束时间
         </Label>
         <DatePicker
           id="endTime"
           initDate={form.endTime}
-          placeholder="选择结束时间"
           onChange={(date) => updateForm('endTime', date)}
+          placeholder="选择结束时间"
         />
       </YStack>
 
       <YStack>
-        <Label width={90} htmlFor="milkIntake">
+        <Label htmlFor="milkIntake" width={90}>
           进食量 (ml)
         </Label>
         <Input
           id="milkIntake"
           keyboardType="numeric"
-          value={milkIntakeText}
-          onChangeText={(text) => updateForm('milkIntake', text ? Number.parseInt(text) : 0)}
+          onChangeText={(text) =>
+            updateForm('milkIntake', text ? Number.parseInt(text) : 0)
+          }
           placeholder="输入进食量 (ml)"
+          value={milkIntakeText}
         />
       </YStack>
 
       <Form.Trigger asChild disabled={status !== 'off'}>
         <Button
-          theme="accent"
           icon={status === 'submitting' ? () => <Spinner /> : undefined}
+          theme="accent"
         >
           {form.id ? '修改记录' : '添加记录'}
         </Button>

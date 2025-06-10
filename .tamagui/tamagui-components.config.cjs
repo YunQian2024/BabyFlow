@@ -46,7 +46,7 @@ var require_es5 = __commonJS({
       var sampleTarget = Array.isArray(originalTarget) ? originalTarget[0] : originalTarget;
       return sampleTarget.ownerDocument.body;
     }, "getDefaultParent");
-    var counterMap2 = /* @__PURE__ */ new WeakMap();
+    var counterMap = /* @__PURE__ */ new WeakMap();
     var uncontrolledNodes = /* @__PURE__ */ new WeakMap();
     var markerMap2 = {};
     var lockCount2 = 0;
@@ -96,9 +96,9 @@ var require_es5 = __commonJS({
             try {
               var attr2 = node.getAttribute(controlAttribute);
               var alreadyHidden = attr2 !== null && attr2 !== "false";
-              var counterValue = (counterMap2.get(node) || 0) + 1;
+              var counterValue = (counterMap.get(node) || 0) + 1;
               var markerValue = (markerCounter.get(node) || 0) + 1;
-              counterMap2.set(node, counterValue);
+              counterMap.set(node, counterValue);
               markerCounter.set(node, markerValue);
               hiddenNodes.push(node);
               if (counterValue === 1 && alreadyHidden) {
@@ -121,9 +121,9 @@ var require_es5 = __commonJS({
       lockCount2++;
       return function() {
         hiddenNodes.forEach(function(node) {
-          var counterValue = counterMap2.get(node) - 1;
+          var counterValue = counterMap.get(node) - 1;
           var markerValue = markerCounter.get(node) - 1;
-          counterMap2.set(node, counterValue);
+          counterMap.set(node, counterValue);
           markerCounter.set(node, markerValue);
           if (!counterValue) {
             if (!uncontrolledNodes.has(node)) {
@@ -137,8 +137,8 @@ var require_es5 = __commonJS({
         });
         lockCount2--;
         if (!lockCount2) {
-          counterMap2 = /* @__PURE__ */ new WeakMap();
-          counterMap2 = /* @__PURE__ */ new WeakMap();
+          counterMap = /* @__PURE__ */ new WeakMap();
+          counterMap = /* @__PURE__ */ new WeakMap();
           uncontrolledNodes = /* @__PURE__ */ new WeakMap();
           markerMap2 = {};
         }
@@ -1822,6 +1822,9 @@ var require_handleScroll = __commonJS({
       var availableScroll = 0;
       var availableScrollTop = 0;
       do {
+        if (!target) {
+          break;
+        }
         var _a = getScrollVariables(axis, target), position = _a[0], scroll_1 = _a[1], capacity = _a[2];
         var elementScroll = scroll_1 - capacity - directionFactor * position;
         if (position || elementScroll) {
@@ -1830,7 +1833,8 @@ var require_handleScroll = __commonJS({
             availableScrollTop += position;
           }
         }
-        target = target.parentNode.host || target.parentNode;
+        var parent_1 = target.parentNode;
+        target = parent_1 && parent_1.nodeType === Node.DOCUMENT_FRAGMENT_NODE ? parent_1.host : parent_1;
       } while (
         // portaled content
         !targetInLock && target !== document.body || // self content
@@ -25592,7 +25596,7 @@ var GorhomPortalItem = /* @__PURE__ */ __name((props) => {
   return cur && node !== cur && setNode(cur), (0, import_react15.useEffect)(() => {
     if (!props.hostName || node) return;
     const listener = /* @__PURE__ */ __name((newNode) => {
-      node && setNode(newNode);
+      setNode(newNode);
     }, "listener");
     return portalListeners[props.hostName] ||= /* @__PURE__ */ new Set(), portalListeners[props.hostName].add(listener), () => {
       portalListeners[props.hostName]?.delete(listener);
@@ -29694,10 +29698,10 @@ var flip = /* @__PURE__ */ __name(function(options) {
         const nextIndex = (((_middlewareData$flip2 = middlewareData.flip) == null ? void 0 : _middlewareData$flip2.index) || 0) + 1;
         const nextPlacement = placements2[nextIndex];
         if (nextPlacement) {
-          var _overflowsData$;
           const ignoreCrossAxisOverflow = checkCrossAxis === "alignment" ? initialSideAxis !== getSideAxis(nextPlacement) : false;
-          const hasInitialMainAxisOverflow = ((_overflowsData$ = overflowsData[0]) == null ? void 0 : _overflowsData$.overflows[0]) > 0;
-          if (!ignoreCrossAxisOverflow || hasInitialMainAxisOverflow) {
+          if (!ignoreCrossAxisOverflow || // We leave the current main axis only if every placement on that axis
+          // overflows the main axis.
+          overflowsData.every((d) => d.overflows[0] > 0 && getSideAxis(d.placement) === initialSideAxis)) {
             return {
               data: {
                 index: nextIndex,
@@ -30767,7 +30771,10 @@ var computePosition2 = /* @__PURE__ */ __name((reference, floating, options) => 
 var React46 = __toESM(require("react"), 1);
 var import_react34 = require("react");
 var ReactDOM2 = __toESM(require("react-dom"), 1);
-var index = typeof document !== "undefined" ? import_react34.useLayoutEffect : import_react34.useEffect;
+var isClient2 = typeof document !== "undefined";
+var noop = /* @__PURE__ */ __name(function noop2() {
+}, "noop");
+var index = isClient2 ? import_react34.useLayoutEffect : noop;
 function deepEqual(a, b) {
   if (a === b) {
     return true;
@@ -31460,23 +31467,20 @@ function getFloatingFocusElement(floatingElement) {
   return floatingElement.hasAttribute(FOCUSABLE_ATTRIBUTE) ? floatingElement : floatingElement.querySelector("[" + FOCUSABLE_ATTRIBUTE + "]") || floatingElement;
 }
 __name(getFloatingFocusElement, "getFloatingFocusElement");
-function getNodeChildren(nodes, id, onlyOpenChildren) {
-  if (onlyOpenChildren === void 0) {
-    onlyOpenChildren = true;
-  }
+function getNodeChildren(nodes, id) {
   let allChildren = nodes.filter((node) => {
     var _node$context;
     return node.parentId === id && ((_node$context = node.context) == null ? void 0 : _node$context.open);
   });
   let currentChildren = allChildren;
   while (currentChildren.length) {
-    currentChildren = onlyOpenChildren ? nodes.filter((node) => {
+    currentChildren = nodes.filter((node) => {
       var _currentChildren;
       return (_currentChildren = currentChildren) == null ? void 0 : _currentChildren.some((n) => {
         var _node$context2;
         return node.parentId === n.id && ((_node$context2 = node.context) == null ? void 0 : _node$context2.open);
       });
-    }) : nodes;
+    });
     allChildren = allChildren.concat(currentChildren);
   }
   return allChildren;
@@ -31547,7 +31551,10 @@ function isMouseLikePointerType(pointerType, strict) {
   return values.includes(pointerType);
 }
 __name(isMouseLikePointerType, "isMouseLikePointerType");
-var index2 = typeof document !== "undefined" ? import_react36.useLayoutEffect : import_react36.useEffect;
+var isClient3 = typeof document !== "undefined";
+var noop3 = /* @__PURE__ */ __name(function noop4() {
+}, "noop");
+var index2 = isClient3 ? import_react36.useLayoutEffect : noop3;
 var SafeReact = {
   ...React49
 };
@@ -32491,7 +32498,17 @@ function getDocument2(node) {
   return (node == null ? void 0 : node.ownerDocument) || document;
 }
 __name(getDocument2, "getDocument");
-var counterMap = /* @__PURE__ */ new WeakMap();
+var counters = {
+  inert: /* @__PURE__ */ new WeakMap(),
+  "aria-hidden": /* @__PURE__ */ new WeakMap(),
+  none: /* @__PURE__ */ new WeakMap()
+};
+function getCounterMap(control) {
+  if (control === "inert") return counters.inert;
+  if (control === "aria-hidden") return counters["aria-hidden"];
+  return counters.none;
+}
+__name(getCounterMap, "getCounterMap");
 var uncontrolledElementsSet = /* @__PURE__ */ new WeakSet();
 var markerMap = {};
 var lockCount$1 = 0;
@@ -32540,8 +32557,8 @@ function applyAttributeToOthers(uncorrectedAvoidElements, body, ariaHidden, iner
       } else {
         const attr2 = controlAttribute ? node.getAttribute(controlAttribute) : null;
         const alreadyHidden = attr2 !== null && attr2 !== "false";
-        const currentCounterValue = counterMap.get(node) || 0;
-        const counterValue = controlAttribute ? currentCounterValue + 1 : currentCounterValue;
+        const counterMap = getCounterMap(controlAttribute);
+        const counterValue = (counterMap.get(node) || 0) + 1;
         const markerValue = (markerCounter.get(node) || 0) + 1;
         counterMap.set(node, counterValue);
         markerCounter.set(node, markerValue);
@@ -32562,8 +32579,9 @@ function applyAttributeToOthers(uncorrectedAvoidElements, body, ariaHidden, iner
   lockCount$1++;
   return () => {
     hiddenElements.forEach((element) => {
+      const counterMap = getCounterMap(controlAttribute);
       const currentCounterValue = counterMap.get(element) || 0;
-      const counterValue = controlAttribute ? currentCounterValue - 1 : currentCounterValue;
+      const counterValue = currentCounterValue - 1;
       const markerValue = (markerCounter.get(element) || 0) - 1;
       counterMap.set(element, counterValue);
       markerCounter.set(element, markerValue);
@@ -32579,8 +32597,9 @@ function applyAttributeToOthers(uncorrectedAvoidElements, body, ariaHidden, iner
     });
     lockCount$1--;
     if (!lockCount$1) {
-      counterMap = /* @__PURE__ */ new WeakMap();
-      counterMap = /* @__PURE__ */ new WeakMap();
+      counters.inert = /* @__PURE__ */ new WeakMap();
+      counters["aria-hidden"] = /* @__PURE__ */ new WeakMap();
+      counters.none = /* @__PURE__ */ new WeakMap();
       uncontrolledElementsSet = /* @__PURE__ */ new WeakSet();
       markerMap = {};
     }
@@ -32978,6 +32997,7 @@ function FloatingFocusManager(props) {
     function handleFocusOutside(event) {
       const relatedTarget = event.relatedTarget;
       const currentTarget = event.currentTarget;
+      const target = getTarget(event);
       queueMicrotask(() => {
         const nodeId = getNodeId();
         const movedToUnrelatedNode = !(contains(domReference, relatedTarget) || contains(floating, relatedTarget) || contains(relatedTarget, floating) || contains(portalContext == null ? void 0 : portalContext.portalNode, relatedTarget) || relatedTarget != null && relatedTarget.hasAttribute(createAttribute("focus-guard")) || tree && (getNodeChildren(tree.nodesRef.current, nodeId).find((node) => {
@@ -32990,7 +33010,7 @@ function FloatingFocusManager(props) {
         if (currentTarget === domReference && floatingFocusElement) {
           handleTabIndex(floatingFocusElement, orderRef);
         }
-        if (restoreFocus && movedToUnrelatedNode && activeElement(getDocument(floatingFocusElement)) === getDocument(floatingFocusElement).body) {
+        if (restoreFocus && currentTarget !== domReference && !(target != null && target.isConnected) && activeElement(getDocument(floatingFocusElement)) === getDocument(floatingFocusElement).body) {
           if (isHTMLElement(floatingFocusElement)) {
             floatingFocusElement.focus();
           }
@@ -33665,13 +33685,14 @@ function useDismiss(context2, props) {
       dataRef.current.insideReactTree = true;
     },
     onBlurCapture() {
+      if (tree) return;
       clearTimeoutIfSet(blurTimeoutRef);
       dataRef.current.insideReactTree = true;
       blurTimeoutRef.current = window.setTimeout(() => {
         dataRef.current.insideReactTree = false;
       });
     }
-  }), [closeOnEscapeKeyDown, outsidePressEvent, dataRef]);
+  }), [closeOnEscapeKeyDown, outsidePressEvent, dataRef, tree]);
   return React50.useMemo(() => enabled ? {
     reference,
     floating
@@ -34948,23 +34969,20 @@ function useInnerOffset(context2, props) {
   } : {}, [enabled, floating]);
 }
 __name(useInnerOffset, "useInnerOffset");
-function getNodeChildren2(nodes, id, onlyOpenChildren) {
-  if (onlyOpenChildren === void 0) {
-    onlyOpenChildren = true;
-  }
+function getNodeChildren2(nodes, id) {
   let allChildren = nodes.filter((node) => {
     var _node$context;
     return node.parentId === id && ((_node$context = node.context) == null ? void 0 : _node$context.open);
   });
   let currentChildren = allChildren;
   while (currentChildren.length) {
-    currentChildren = onlyOpenChildren ? nodes.filter((node) => {
+    currentChildren = nodes.filter((node) => {
       var _currentChildren;
       return (_currentChildren = currentChildren) == null ? void 0 : _currentChildren.some((n) => {
         var _node$context2;
         return node.parentId === n.id && ((_node$context2 = node.context) == null ? void 0 : _node$context2.open);
       });
-    }) : nodes;
+    });
     allChildren = allChildren.concat(currentChildren);
   }
   return allChildren;
@@ -35081,12 +35099,7 @@ function safePolygon(options) {
       if (isLeave && isElement(event.relatedTarget) && contains2(elements.floating, event.relatedTarget)) {
         return;
       }
-      if (tree && getNodeChildren2(tree.nodesRef.current, nodeId).some((_ref2) => {
-        let {
-          context: context2
-        } = _ref2;
-        return context2 == null ? void 0 : context2.open;
-      })) {
+      if (tree && getNodeChildren2(tree.nodesRef.current, nodeId).length) {
         return;
       }
       if (side === "top" && y >= refRect.bottom - 1 || side === "bottom" && y <= refRect.top + 1 || side === "left" && x >= refRect.right - 1 || side === "right" && x <= refRect.left + 1) {
@@ -35107,8 +35120,8 @@ function safePolygon(options) {
           rectPoly = [[refRect.right - 1, bottom], [refRect.right - 1, top], [rect.left + 1, top], [rect.left + 1, bottom]];
           break;
       }
-      function getPolygon(_ref3) {
-        let [x2, y2] = _ref3;
+      function getPolygon(_ref2) {
+        let [x2, y2] = _ref2;
         switch (side) {
           case "top": {
             const cursorPointOne = [isFloatingWider ? x2 + buffer / 2 : cursorLeaveFromRight ? x2 + buffer * 4 : x2 - buffer * 4, y2 + buffer + 1];

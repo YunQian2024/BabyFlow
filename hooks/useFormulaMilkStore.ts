@@ -1,5 +1,5 @@
+import type { FormulaMilk } from '@/db/schema'
 import { create } from 'zustand'
-import type { FormulaMilk } from '../db/schema'
 
 interface FormulaMilkState {
   list: FormulaMilk[]

@@ -6,8 +6,7 @@ import { SplashScreen, Stack } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { useEffect } from 'react'
 import { useColorScheme } from 'react-native'
-import { useTheme } from 'tamagui'
-import { Provider } from './Provider'
+import Provider from './Provider'
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -52,7 +51,6 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme()
-  const theme = useTheme()
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
@@ -65,19 +63,6 @@ function RootLayoutNav() {
         />
         <Stack.Screen name="add-or-update-formula-milk" options={{ title: '配方奶' }} />
         <Stack.Screen name="add-or-update-poop" options={{ title: '臭臭' }} />
-        <Stack.Screen
-          name="modal"
-          options={{
-            title: 'Tamagui + Expo',
-            presentation: 'modal',
-            animation: 'slide_from_right',
-            gestureEnabled: true,
-            gestureDirection: 'horizontal',
-            contentStyle: {
-              backgroundColor: theme.background.val,
-            },
-          }}
-        />
       </Stack>
     </ThemeProvider>
   )

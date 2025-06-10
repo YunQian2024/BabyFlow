@@ -1,5 +1,5 @@
+import type { Poop } from '@/db/schema'
 import { create } from 'zustand'
-import type { Poop } from '../db/schema'
 
 interface PoopState {
   list: Poop[]

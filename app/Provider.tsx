@@ -2,9 +2,11 @@ import { ToastProvider, ToastViewport } from '@tamagui/toast'
 import { useColorScheme } from 'react-native'
 import { TamaguiProvider, type TamaguiProviderProps } from 'tamagui'
 import { config } from '../tamagui.config'
-import { CurrentToast } from './CurrentToast'
 
-export function Provider({ children, ...rest }: Omit<TamaguiProviderProps, 'config'>) {
+export default function Provider({
+  children,
+  ...rest
+}: Omit<TamaguiProviderProps, 'config'>) {
   const colorScheme = useColorScheme()
 
   return (
@@ -14,7 +16,6 @@ export function Provider({ children, ...rest }: Omit<TamaguiProviderProps, 'conf
       {...rest}
     >
       <ToastProvider
-        swipeDirection="horizontal"
         duration={6000}
         native={
           [
@@ -22,10 +23,10 @@ export function Provider({ children, ...rest }: Omit<TamaguiProviderProps, 'conf
             // 'mobile'
           ]
         }
+        swipeDirection="horizontal"
       >
         {children}
-        <CurrentToast />
-        <ToastViewport top="$8" left={0} right={0} />
+        <ToastViewport left={0} right={0} top="$8" />
       </ToastProvider>
     </TamaguiProvider>
   )

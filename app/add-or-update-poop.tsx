@@ -1,26 +1,24 @@
-import { useDb } from '../hooks/useDb'
-import { usePoopStore } from '../hooks/usePoopStore'
+import { poopTable } from '@/db/schema'
+import { useDb } from '@/hooks/useDb'
+import { usePoopStore } from '@/hooks/usePoopStore'
 import { useRouter } from 'expo-router'
-import { useState } from 'react'
-import { poopTable } from '../db/schema'
 
-import { DatePicker } from '../components/DatePicker'
+import { DatePicker } from '@/components/DatePicker'
 import { eq } from 'drizzle-orm'
+import React from 'react'
 import {
   Button,
   Form,
-  Spinner,
-  Input,
-  YStack,
   Label,
-  XStack,
-  View,
-  ToggleGroup,
+  Spinner,
   Text,
   TextArea,
+  ToggleGroup,
+  View,
+  XStack,
+  YStack,
   useTheme,
 } from 'tamagui'
-import React from 'react'
 export default function AddPoop() {
   const [status, setStatus] = React.useState<'off' | 'submitting' | 'submitted'>('off')
 
@@ -45,97 +43,97 @@ export default function AddPoop() {
   return (
     <Form gap="$3" onSubmit={handleSubmit} p="$4">
       <YStack>
-        <Label width={90} htmlFor="createTime">
+        <Label htmlFor="createTime" width={90}>
           记录时间
         </Label>
         <DatePicker
           id="createTime"
           initDate={form.createTime}
-          placeholder="选择记录时间"
           onChange={(date) => updateForm('createTime', date)}
+          placeholder="选择记录时间"
         />
       </YStack>
 
       <YStack>
-        <Label width={90} htmlFor="color">
+        <Label htmlFor="color" width={90}>
           颜色
         </Label>
         <XStack gap="$2">
           <View
-            style={{ backgroundColor: form.color }}
-            rounded="$2"
-            width="$3"
             height="$3"
+            rounded="$2"
+            style={{ backgroundColor: form.color }}
+            width="$3"
           />
           <ToggleGroup
-            type="single"
-            size="$6"
-            value={form.color}
             onValueChange={(value) => updateForm('color', value)}
+            size="$6"
+            type="single"
+            value={form.color}
           >
-            <ToggleGroup.Item value="#b08c3c" bg="#b08c3c"></ToggleGroup.Item>
-            <ToggleGroup.Item value="#a67b5b" bg="#a67b5b"></ToggleGroup.Item>
-            <ToggleGroup.Item value="#8b5a2b" bg="#8b5a2b"></ToggleGroup.Item>
-            <ToggleGroup.Item value="#e69c4a" bg="#e69c4a"></ToggleGroup.Item>
-            <ToggleGroup.Item value="#b0b34f" bg="#b0b34f"></ToggleGroup.Item>
-            <ToggleGroup.Item value="#556b2f" bg="#556b2f"></ToggleGroup.Item>
-            <ToggleGroup.Item value="#1a1f16" bg="#1a1f16"></ToggleGroup.Item>
-            <ToggleGroup.Item value="#e0d8c6" bg="#e0d8c6"></ToggleGroup.Item>
+            <ToggleGroup.Item bg="#b08c3c" value="#b08c3c"></ToggleGroup.Item>
+            <ToggleGroup.Item bg="#a67b5b" value="#a67b5b"></ToggleGroup.Item>
+            <ToggleGroup.Item bg="#8b5a2b" value="#8b5a2b"></ToggleGroup.Item>
+            <ToggleGroup.Item bg="#e69c4a" value="#e69c4a"></ToggleGroup.Item>
+            <ToggleGroup.Item bg="#b0b34f" value="#b0b34f"></ToggleGroup.Item>
+            <ToggleGroup.Item bg="#556b2f" value="#556b2f"></ToggleGroup.Item>
+            <ToggleGroup.Item bg="#1a1f16" value="#1a1f16"></ToggleGroup.Item>
+            <ToggleGroup.Item bg="#e0d8c6" value="#e0d8c6"></ToggleGroup.Item>
           </ToggleGroup>
         </XStack>
       </YStack>
 
       <YStack>
-        <Label width={90} htmlFor="shape">
+        <Label htmlFor="shape" width={90}>
           形状
         </Label>
         <XStack gap="$2">
           <ToggleGroup
-            type="single"
-            width="100%"
             justify="space-evenly"
-            value={form.shape}
             onValueChange={(value) => updateForm('shape', value)}
+            type="single"
+            value={form.shape}
+            width="100%"
           >
             <ToggleGroup.Item
-              value="正常"
-              color={form.shape === '正常' ? '$color1' : '$color'}
               bg={form.shape === '正常' ? '$accent1' : '$background'}
+              color={form.shape === '正常' ? '$color1' : '$color'}
+              value="正常"
             >
               <Text>正常</Text>
             </ToggleGroup.Item>
             <ToggleGroup.Item
-              value="稀稠"
-              color={form.shape === '稀稠' ? '$color1' : '$color'}
               bg={form.shape === '稀稠' ? '$accent1' : '$background'}
+              color={form.shape === '稀稠' ? '$color1' : '$color'}
+              value="稀稠"
             >
               <Text>稀稠</Text>
             </ToggleGroup.Item>
             <ToggleGroup.Item
-              value="粘稠"
-              color={form.shape === '粘稠' ? '$color1' : '$color'}
               bg={form.shape === '粘稠' ? '$accent1' : '$background'}
+              color={form.shape === '粘稠' ? '$color1' : '$color'}
+              value="粘稠"
             >
               <Text>粘稠</Text>
             </ToggleGroup.Item>
             <ToggleGroup.Item
-              value="较干"
-              color={form.shape === '较干' ? '$color1' : '$color'}
               bg={form.shape === '较干' ? '$accent1' : '$background'}
+              color={form.shape === '较干' ? '$color1' : '$color'}
+              value="较干"
             >
               <Text>较干</Text>
             </ToggleGroup.Item>
             <ToggleGroup.Item
-              value="干样"
-              color={form.shape === '干样' ? '$color1' : '$color'}
               bg={form.shape === '干样' ? '$accent1' : '$background'}
+              color={form.shape === '干样' ? '$color1' : '$color'}
+              value="干样"
             >
               <Text>干样</Text>
             </ToggleGroup.Item>
             <ToggleGroup.Item
-              value="水样"
-              color={form.shape === '水样' ? '$color1' : '$color'}
               bg={form.shape === '水样' ? '$accent1' : '$background'}
+              color={form.shape === '水样' ? '$color1' : '$color'}
+              value="水样"
             >
               <Text>水样</Text>
             </ToggleGroup.Item>
@@ -144,22 +142,22 @@ export default function AddPoop() {
       </YStack>
 
       <YStack>
-        <Label width={90} htmlFor="remake">
+        <Label htmlFor="remake" width={90}>
           备注
         </Label>
         <TextArea
           id="remake"
-          size="$4"
-          value={form.remark || ''}
           onChangeText={(text) => updateForm('remark', text)}
           placeholder="输入备注..."
+          size="$4"
+          value={form.remark || ''}
         />
       </YStack>
 
       <Form.Trigger asChild disabled={status !== 'off'}>
         <Button
-          theme="accent"
           icon={status === 'submitting' ? () => <Spinner /> : undefined}
+          theme="accent"
         >
           {form.id ? '修改记录' : '添加记录'}
         </Button>
