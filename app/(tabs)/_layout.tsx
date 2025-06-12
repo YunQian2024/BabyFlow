@@ -1,4 +1,4 @@
-import { Atom, AudioWaveform } from '@tamagui/lucide-icons'
+import { House, Settings } from '@tamagui/lucide-icons'
 import { Tabs } from 'expo-router'
 import { useTheme } from 'tamagui'
 
@@ -9,7 +9,7 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: theme.red10.val,
+        tabBarActiveTintColor: theme.accent1.val,
         tabBarStyle: {
           backgroundColor: theme.background.val,
           borderTopColor: theme.borderColor.val,
@@ -25,14 +25,14 @@ export default function TabLayout() {
         name="index"
         options={{
           title: '主页',
-          tabBarIcon: ({ color }) => <Atom color={color as any} />,
+          tabBarIcon: ({ color }) => <House color={color as any} />,
         }}
       />
       <Tabs.Screen
-        name="two"
+        name="settings"
         options={{
           title: '设置',
-          tabBarIcon: ({ color }) => <AudioWaveform color={color as any} />,
+          tabBarIcon: ({ color }) => <Settings color={color as any} />,
         }}
       />
     </Tabs>

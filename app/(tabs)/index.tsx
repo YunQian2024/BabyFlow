@@ -1,3 +1,4 @@
+import DailyInfo from '@/components/DailyInfo'
 import { type FormulaMilk, type Poop, formulaMilkTable, poopTable } from '@/db/schema'
 import migrations from '@/drizzle/migrations'
 import { useDb } from '@/hooks/useDb'
@@ -7,10 +8,10 @@ import PoopIcon from 'components/icon/PoopIcon'
 import dayjs from 'dayjs'
 import { eq, like } from 'drizzle-orm'
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator'
+import * as MediaLibrary from 'expo-media-library'
 import { useRouter } from 'expo-router'
 import { usePoopStore } from 'hooks/usePoopStore'
 import { useEffect, useState } from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import {
   AlertDialog,
   Button,
@@ -26,16 +27,17 @@ export default function HomeScreen() {
   const router = useRouter()
   const db = useDb()
   const { success, error } = useMigrations(db, migrations)
+  const [status, requestPermission] = MediaLibrary.usePermissions()
   const {
-    list: milkList,
+    list: formulaMilkList,
     dailyTimes,
     dailyMilkIntake,
-    listNeedReload,
-    setList,
-    setForm,
+    listNeedReload: formulaMilkListNeedReload,
+    setList: setFormulaMilkList,
+    setForm: setFormulaMilkForm,
     setDailyTimes,
     setDailyMilkIntake,
-    setListNeedReload,
+    setListNeedReload: setFormulaMilkListNeedReload,
   } = useFormulaMilkStore()
 
   const {
@@ -49,23 +51,32 @@ export default function HomeScreen() {
   } = usePoopStore()
 
   const [showAlertDialog, setShowAlertDialog] = useState(false)
-  const handleClose = () => setShowAlertDialog(false)
+  const [deleteObj, setDeleteObj] = useState<FormulaMilk | Poop | null>(null)
 
-  const [deleteId, setDeleteId] = useState<number | null>(null)
+  if (status === null) {
+    requestPermission()
+  }
+
+  const isMilkType = (obj: any): obj is FormulaMilk => obj.type === 'FORMULA_MILK'
+  const isPoopType = (obj: any): obj is Poop => obj.type === 'POOP'
 
   const handleDelete = async () => {
-    if (deleteId) {
-      await db.delete(formulaMilkTable).where(eq(formulaMilkTable.id, deleteId))
-      setDeleteId(null)
-      setListNeedReload(true)
+    if (deleteObj) {
+      if (isMilkType(deleteObj)) {
+        await db.delete(formulaMilkTable).where(eq(formulaMilkTable.id, deleteObj.id))
+        setFormulaMilkListNeedReload(true)
+      } else if (isPoopType(deleteObj)) {
+        await db.delete(poopTable).where(eq(poopTable.id, deleteObj.id))
+        setPoopListNeedReload(true)
+      }
+      setDeleteObj(null)
       setShowAlertDialog(false)
     }
   }
 
   useEffect(() => {
     if (!success) return
-
-    if (!listNeedReload) return
+    if (!formulaMilkListNeedReload) return
     ;(async () => {
       const formulaMilkList = await db
         .select()
@@ -73,19 +84,19 @@ export default function HomeScreen() {
         .where(
           like(formulaMilkTable.endTime, dayjs(new Date()).format('YYYY-MM-DD') + '%')
         )
-      setList(formulaMilkList)
+      setFormulaMilkList(formulaMilkList)
       setDailyTimes(formulaMilkList.length)
       setDailyMilkIntake(
         formulaMilkList.reduce((value, item) => item.milkIntake + value, 0)
       )
-      setListNeedReload(false)
+      setFormulaMilkListNeedReload(false)
     })()
   }, [
     db,
-    setList,
-    setListNeedReload,
-    listNeedReload,
+    formulaMilkListNeedReload,
     success,
+    setFormulaMilkList,
+    setFormulaMilkListNeedReload,
     setDailyTimes,
     setDailyMilkIntake,
   ])
@@ -121,7 +132,7 @@ export default function HomeScreen() {
   }
 
   const list = [
-    ...milkList.map((item) => {
+    ...formulaMilkList.map((item) => {
       return { ...item, type: 'FORMULA_MILK', createTime: item.endTime }
     }),
     ...poopList.map((item) => {
@@ -131,24 +142,10 @@ export default function HomeScreen() {
 
   return (
     <YStack bg="$background" gap="$2" height="100%" p="$2">
-      <SafeAreaView>
-        <YStack borderColor="$borderColor" borderWidth={2} gap="$2" p="$2" rounded="$4">
-          <Text>当日统计+宝宝头像</Text>
-          <Text>吃奶次数: {dailyTimes}次</Text>
-          <Text>总进食量: {dailyMilkIntake}ml</Text>
-          <Text>臭臭次数: {poopTimes}</Text>
-        </YStack>
-      </SafeAreaView>
+      <DailyInfo />
       <ScrollView flex={1}>
         <YStack gap="$2">
           {list.map((item) => {
-            // 类型守卫：配方奶类型
-            const isMilkType = (obj: any): obj is FormulaMilk =>
-              obj.type === 'FORMULA_MILK'
-
-            // 类型守卫：大便类型
-            const isPoopType = (obj: any): obj is Poop => obj.type === 'POOP'
-
             return isMilkType(item) ? (
               // 配方奶类型
               <Card
@@ -159,11 +156,11 @@ export default function HomeScreen() {
                 items="center"
                 key={item.id}
                 onLongPress={() => {
-                  setDeleteId(item.id)
+                  setDeleteObj(item)
                   setShowAlertDialog(true)
                 }}
                 onPress={() => {
-                  setForm(item)
+                  setFormulaMilkForm(item)
                   router.push('/add-or-update-formula-milk')
                 }}
                 p="$4"
@@ -189,6 +186,10 @@ export default function HomeScreen() {
                 height={60}
                 items="center"
                 key={item.id}
+                onLongPress={() => {
+                  setDeleteObj(item)
+                  setShowAlertDialog(true)
+                }}
                 onPress={() => {
                   setPoopForm(item)
                   router.push('/add-or-update-poop')
@@ -211,7 +212,7 @@ export default function HomeScreen() {
         <Button
           icon={Milk}
           onPress={() => {
-            setForm({
+            setFormulaMilkForm({
               startTime: dayjs(new Date()).add(-11, 'minute').format('YYYY-MM-DD HH:mm'),
               endTime: dayjs(new Date()).add(-1, 'minute').format('YYYY-MM-DD HH:mm'),
               durationMinutes: 10,

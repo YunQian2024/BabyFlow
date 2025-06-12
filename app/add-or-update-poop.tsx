@@ -1,14 +1,18 @@
 import { poopTable } from '@/db/schema'
 import { useDb } from '@/hooks/useDb'
 import { usePoopStore } from '@/hooks/usePoopStore'
+import { Camera } from '@tamagui/lucide-icons'
 import { useRouter } from 'expo-router'
 
 import { DatePicker } from '@/components/DatePicker'
 import { eq } from 'drizzle-orm'
+import * as FileSystem from 'expo-file-system'
+import * as ImagePicker from 'expo-image-picker'
 import React from 'react'
 import {
   Button,
   Form,
+  Image,
   Label,
   Spinner,
   Text,
@@ -17,8 +21,10 @@ import {
   View,
   XStack,
   YStack,
-  useTheme,
 } from 'tamagui'
+
+const babyAvatarPlaceholder = require('@/assets/images/baby-avatar-placeholder.png')
+
 export default function AddPoop() {
   const [status, setStatus] = React.useState<'off' | 'submitting' | 'submitted'>('off')
 
@@ -26,7 +32,21 @@ export default function AddPoop() {
 
   const db = useDb()
   const { form, updateForm, setListNeedReload } = usePoopStore()
-  const theme = useTheme()
+
+  const pickImageAsync = async () => {
+    let result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+    })
+
+    if (!result.canceled) {
+      const fileUri = FileSystem.documentDirectory + '/' + result.assets[0].fileName
+      await FileSystem.copyAsync({
+        from: result.assets[0].uri,
+        to: fileUri,
+      })
+      updateForm('image', fileUri)
+    }
+  }
 
   const handleSubmit = async () => {
     setStatus('submitting')
@@ -139,6 +159,19 @@ export default function AddPoop() {
             </ToggleGroup.Item>
           </ToggleGroup>
         </XStack>
+      </YStack>
+
+      <YStack>
+        <Label htmlFor="remake" width={90}>
+          照片
+        </Label>
+        {form.image ? (
+          <Image height="$6" rounded="$4" source={{ uri: form.image }} width="$10" />
+        ) : (
+          <Button icon={Camera} onPress={pickImageAsync}>
+            拍照
+          </Button>
+        )}
       </YStack>
 
       <YStack>
