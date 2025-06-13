@@ -35,7 +35,15 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "expo-sqlite"
+      "expo-sqlite",
+      [
+        "@sentry/react-native/expo",
+        {
+          "url": "https://sentry.io/",
+          "project": "baby-flow",
+          "organization": "yunqian2024"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

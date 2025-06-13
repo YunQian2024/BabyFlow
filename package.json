@@ -4,6 +4,7 @@
     "@react-navigation/bottom-tabs": "^7.3.10",
     "@react-navigation/elements": "^2.3.8",
     "@react-navigation/native": "^7.1.6",
+    "@sentry/react-native": "^6.15.1",
     "@tamagui/config": "^1.126.13",
     "@tamagui/core": "^1.126.13",
     "@tamagui/lucide-icons": "^1.126.13",
